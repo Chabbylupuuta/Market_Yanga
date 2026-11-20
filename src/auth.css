@@ -1,0 +1,91 @@
+.yanga-auth-backdrop {
+  position: fixed;
+  z-index: 1000;
+  inset: 0;
+  display: grid;
+  overflow-y: auto;
+  place-items: center;
+  padding: 24px;
+  background: #18251bd9;
+  backdrop-filter: blur(5px);
+}
+
+.yanga-auth-dialog {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  width: min(790px, 100%);
+  min-height: 510px;
+  grid-template-columns: 0.86fr 1fr;
+  border-radius: 12px;
+  background: #fffefa;
+  box-shadow: 0 25px 90px #101a1270;
+  animation: yanga-auth-in 200ms ease-out;
+}
+
+@keyframes yanga-auth-in {
+  from { transform: translateY(8px) scale(0.99); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.yanga-auth-close {
+  position: absolute;
+  z-index: 2;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border: 1px solid #e8e6dd;
+  border-radius: 50%;
+  background: #fffefa;
+  color: #696c63;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.yanga-auth-art {
+  display: flex;
+  min-height: 510px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  background: radial-gradient(circle at 60% 36%, #e8b65f 0 18%, transparent 18.5%), linear-gradient(160deg, #e9eddf 0 48%, #819976 48% 100%);
+}
+
+.yanga-auth-art span { font-size: 82px; }
+.yanga-auth-art strong { align-self: flex-start; margin: auto 0 32px 30px; color: white; font-size: 9px; letter-spacing: 2px; }
+
+.yanga-auth-content { padding: 36px 39px 28px; }
+.yanga-auth-brand { display: inline-block; margin-bottom: 28px; color: #242a24; font-family: Manrope, sans-serif; font-size: 27px; font-weight: 800; letter-spacing: -1.5px; text-decoration: none; }
+.yanga-auth-brand span { color: #e77a25; }
+.yanga-auth-kicker { color: #245c3b; font-size: 9px; font-weight: 700; letter-spacing: 1.3px; }
+.yanga-auth-content h2 { margin: 8px 0 10px; font-family: Manrope, sans-serif; font-size: 33px; letter-spacing: -1.5px; line-height: 1.14; }
+.yanga-auth-content h2 em { color: #245c3b; font-family: Georgia, serif; font-weight: 400; }
+.yanga-auth-intro { margin-bottom: 18px; color: #777a70; font-size: 11px; line-height: 1.7; }
+.yanga-auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; margin: 0 0 14px; padding: 4px; border-radius: 7px; background: #f1f0e9; }
+.yanga-auth-tabs button { min-height: 33px; border: 0; border-radius: 5px; background: transparent; color: #696c63; font-size: 11px; cursor: pointer; }
+.yanga-auth-tabs button.active { background: white; color: #245c3b; box-shadow: 0 1px 5px #242a2418; font-weight: 700; }
+.yanga-auth-form label { display: block; margin: 0 0 12px; color: #42473e; font-size: 10px; font-weight: 700; }
+.yanga-auth-form input:not([type='checkbox']) { display: block; width: 100%; height: 42px; margin-top: 6px; padding: 0 11px; border: 1px solid #deded3; border-radius: 6px; background: white; color: #242a24; font-size: 11px; }
+.yanga-auth-meta { display: flex; align-items: center; justify-content: space-between; margin: 1px 0 13px; }
+.yanga-auth-meta .yanga-auth-remember { display: flex; align-items: center; gap: 6px; margin: 0; font-weight: 500; }
+.yanga-auth-meta input { accent-color: #245c3b; }
+.yanga-auth-meta button, .yanga-auth-back { border: 0; background: transparent; color: #245c3b; font-size: 10px; font-weight: 700; cursor: pointer; }
+.yanga-auth-submit { display: flex; width: 100%; min-height: 44px; align-items: center; justify-content: space-between; margin-top: 10px; padding: 0 14px; border: 0; border-radius: 7px; background: #245c3b; color: white; font-size: 11px; font-weight: 700; cursor: pointer; }
+.yanga-auth-submit:hover { background: #17462c; }
+.yanga-auth-submit:disabled { cursor: wait; opacity: 0.7; }
+.yanga-auth-message { margin: 8px 0; color: #245c3b; font-size: 10px; line-height: 1.5; }
+.yanga-auth-message.error { color: #b83227; }
+.yanga-auth-back { margin-top: 12px; padding: 5px 0; }
+.yanga-auth-note { margin-top: 17px; color: #85877e; font-size: 9px; line-height: 1.5; }
+
+@media (max-width: 640px) {
+  .yanga-auth-backdrop { padding: 14px; }
+  .yanga-auth-dialog { width: min(440px, 100%); min-height: auto; grid-template-columns: 1fr; }
+  .yanga-auth-art { display: none; }
+  .yanga-auth-content { padding: 32px 25px 24px; }
+  .yanga-auth-brand { margin-bottom: 22px; }
+}
