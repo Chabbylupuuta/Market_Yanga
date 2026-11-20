@@ -1,4 +1,4 @@
-import { useMemo, useState, type FormEvent } from 'react'
+import { useMemo, useState } from 'react'
 import './App.css'
 
 type Category = 'All listings' | 'Farm produce' | 'Livestock' | 'Goods' | 'Services' | 'Jobs'
@@ -87,6 +87,12 @@ const listings: Listing[] = [
 
 const districts = ['Everywhere', 'Lusaka', 'Chongwe', 'Kafue', 'Kanyama', 'Kabwata']
 
+const nearbyMarkets = [
+  { name: 'Soweto Market', area: 'Lumumba Road, Lusaka' },
+  { name: 'Lusaka City Market', area: 'City centre, Lusaka' },
+  { name: 'Kamwala Market', area: 'Kamwala, Lusaka' },
+]
+
 function Icon({
   name,
   size = 20,
@@ -135,9 +141,8 @@ function App() {
   const [search, setSearch] = useState('')
   const [district, setDistrict] = useState('Everywhere')
   const [favorites, setFavorites] = useState<number[]>([])
-  const [loginOpen, setLoginOpen] = useState(false)
-  const [phone, setPhone] = useState('')
-  const [loginMessage, setLoginMessage] = useState('')
+  const [nearbyMapUrl, setNearbyMapUrl] = useState('')
+  const [locationMessage, setLocationMessage] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
 
   const filteredListings = useMemo(() => {
@@ -154,9 +159,25 @@ function App() {
     setFavorites((current) => current.includes(id) ? current.filter((favorite) => favorite !== id) : [...current, id])
   }
 
-  function handleLogin(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setLoginMessage('Thanks! Phone verification will be available when account sign-in is connected.')
+  function findMarketsNearMe() {
+    if (!navigator.geolocation) {
+      setLocationMessage('Location services are not available in this browser. Choose a Lusaka market below instead.')
+      return
+    }
+
+    setLocationMessage('Finding your location…')
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        const query = encodeURIComponent(`markets near ${coords.latitude},${coords.longitude}`)
+        setNearbyMapUrl(`https://www.google.com/maps/search/?api=1&query=${query}`)
+        setLocationMessage('Your location is ready. Open the map to see nearby markets.')
+      },
+      () => {
+        setNearbyMapUrl('')
+        setLocationMessage('We could not access your location. Allow location access or choose a Lusaka market below.')
+      },
+      { timeout: 10000 },
+    )
   }
 
   return (
@@ -174,8 +195,8 @@ function App() {
           <a href="#community" onClick={() => setMenuOpen(false)}>Our community</a>
         </nav>
         <div className="header-actions">
-          <button className="login-link" onClick={() => { setLoginOpen(true); setLoginMessage('') }}>Log in</button>
-          <button className="sell-button" onClick={() => { setLoginOpen(true); setLoginMessage('') }}><Icon name="plus" size={17} /> Sell something</button>
+          <button className="login-link">Log in</button>
+          <button className="sell-button"><Icon name="plus" size={17} /> Sell something</button>
         </div>
       </header>
 
@@ -190,14 +211,11 @@ function App() {
               <p><strong>Made for our communities</strong><br /><span>Connecting neighbours, one listing at a time.</span></p>
             </div>
           </div>
-          <div className="hero-art" role="img" aria-label="A colourful illustration of a Zambian local market">
-            <div className="art-sun" />
-            <div className="art-hill art-hill-back" />
-            <div className="art-hill art-hill-front" />
-            <div className="art-market-card"><span className="art-card-icon">🌽</span><span><strong>Fresh from nearby</strong><small>Good things, close to home</small></span><span className="art-check"><Icon name="check" size={15} /></span></div>
-            <div className="art-market-stall"><div className="stall-roof"><i /><i /><i /><i /><i /></div><div className="stall-awning" /><div className="stall-counter"><span>🍅</span><span>🥬</span><span>🍌</span><span>🌶️</span></div><div className="stall-legs" /></div>
-            <div className="art-leaf leaf-one">✦</div><div className="art-leaf leaf-two">✳</div>
-            <div className="art-tag">LUSAKA<br /><strong>& BEYOND</strong></div>
+          <div className="hero-art">
+            <img className="hero-market-photo" src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Lusaka_curio_market.png" alt="A vendor at a curio market in Lusaka, Zambia" />
+            <div className="hero-photo-shade" />
+            <span className="hero-photo-label"><Icon name="pin" size={15} /> LUSAKA, ZAMBIA</span>
+            <a className="photo-credit" href="https://commons.wikimedia.org/wiki/File:Lusaka_curio_market.png" target="_blank" rel="noreferrer">Photo: Allan Samila · CC BY-SA 4.0</a>
           </div>
         </section>
 
@@ -206,6 +224,27 @@ function App() {
           <div className="search-divider" />
           <label className="location-field"><Icon name="pin" size={20} /><span className="sr-only">Choose a location</span><select value={district} onChange={(event) => setDistrict(event.target.value)}>{districts.map((place) => <option key={place}>{place}</option>)}</select></label>
           <button className="search-button" onClick={() => document.getElementById('listings')?.scrollIntoView({ behavior: 'smooth' })}>Find my market <Icon name="arrow" size={18} /></button>
+        </section>
+
+        <section className="nearby-markets" aria-labelledby="nearby-title">
+          <div className="nearby-heading">
+            <div><span className="section-kicker">MEET THE MARKETS</span><h2 id="nearby-title">Find your <em>local spot.</em></h2></div>
+            <div className="nearby-actions">
+              <button className="location-button" onClick={findMarketsNearMe}><Icon name="pin" size={17} /> Find markets near me</button>
+              {nearbyMapUrl && <a className="nearby-map-link" href={nearbyMapUrl} target="_blank" rel="noreferrer">Open nearby map <Icon name="arrow" size={15} /></a>}
+            </div>
+          </div>
+          {locationMessage && <p className="location-message" role="status">{locationMessage}</p>}
+          <div className="market-place-grid">
+            {nearbyMarkets.map((market) => (
+              <article className="market-place-card" key={market.name}>
+                <span className="market-place-pin"><Icon name="pin" size={18} /></span>
+                <div><h3>{market.name}</h3><p>{market.area}</p></div>
+                <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${market.name}, ${market.area}`)}`} target="_blank" rel="noreferrer" aria-label={`Get directions to ${market.name}`}><Icon name="arrow" size={17} /></a>
+              </article>
+            ))}
+          </div>
+          <p className="market-place-note">Popular Lusaka locations. Use your location to find markets near you anywhere in Zambia.</p>
         </section>
 
         <section className="market-section" id="listings">
@@ -242,33 +281,12 @@ function App() {
         <section className="community-banner" id="community">
           <div className="community-icon">🌱</div>
           <div><span className="section-kicker">GROW SOMETHING GOOD</span><h2>Your next customer is closer than you think.</h2><p>Put your products, skills or next big idea in front of your neighbours.</p></div>
-          <button onClick={() => { setLoginOpen(true); setLoginMessage('') }}>Join the community <Icon name="arrow" size={17} /></button>
+          <button>Join the community <Icon name="arrow" size={17} /></button>
           <span className="banner-decoration">✳</span>
         </section>
       </main>
 
       <footer className="site-footer" id="how-it-works"><a className="footer-brand" href="#">yanga<span>.</span></a><span>A little closer to home. Made with care in Zambia.</span><span className="footer-location"><Icon name="pin" size={14} /> Lusaka, Zambia</span></footer>
-
-      {loginOpen && <div className="modal-backdrop" role="presentation" onMouseDown={(event) => { if (event.target === event.currentTarget) setLoginOpen(false) }}>
-        <section className="login-modal" role="dialog" aria-modal="true" aria-labelledby="login-title">
-          <button className="modal-close" aria-label="Close sign-in dialog" onClick={() => setLoginOpen(false)}><Icon name="close" /></button>
-          <div className="login-illustration"><div className="login-sun" /><span className="login-plant">🌿</span><span className="login-basket">🧺</span><div className="login-note">YOUR LOCAL MARKET</div></div>
-          <div className="login-content">
-            <a className="brand login-brand" href="#"><span className="brand-mark"><span className="brand-sun">✳</span><span className="brand-eagle">Y</span></span><span className="brand-copy"><strong>yanga</strong><small>YOUR LOCAL MARKET</small></span></a>
-            <span className="section-kicker">GOOD TO HAVE YOU HERE</span>
-            <h2 id="login-title">Welcome to<br /><em>your market.</em></h2>
-            <p className="login-intro">Sign in with your Zambian phone number to save listings and connect with your community.</p>
-            <form onSubmit={handleLogin}>
-              <label htmlFor="phone-number">Phone number</label>
-              <div className="phone-input"><span className="country-code"><span className="zambia-flag" aria-label="Zambian flag"><i /><i /><i /></span>+260</span><input id="phone-number" type="tel" inputMode="numeric" autoComplete="tel-national" placeholder="97 123 4567" value={phone} onChange={(event) => { setPhone(event.target.value); setLoginMessage('') }} required pattern="[0-9 ]{9,12}" title="Enter your Zambian phone number, for example 97 123 4567" /></div>
-              <button className="login-submit" type="submit">Continue with phone <Icon name="arrow" size={18} /></button>
-            </form>
-            {loginMessage && <p className="login-message" role="status">{loginMessage}</p>}
-            <p className="login-terms">By continuing, you agree to our <a href="#how-it-works">Terms</a> and <a href="#how-it-works">Privacy Policy</a>.</p>
-            <div className="login-safe"><span><Icon name="check" size={14} /></span>Your number stays private. Connect only when you choose.</div>
-          </div>
-        </section>
-      </div>}
     </div>
   )
 }

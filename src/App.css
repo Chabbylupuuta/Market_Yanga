@@ -277,8 +277,56 @@
   overflow: hidden;
   height: 345px;
   isolation: isolate;
-  border-radius: 6px 70px 6px 6px;
-  background: #efe8d8;
+  border: 4px solid #fffefa;
+  border-radius: 10px 70px 10px 10px;
+  background: #e8e4d7;
+  box-shadow: 0 18px 45px #34331e20;
+}
+
+.hero-market-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 52%;
+}
+
+.hero-photo-shade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #121b1300 42%, #121b13a8 100%), linear-gradient(90deg, #121b1335, transparent 75%);
+}
+
+.hero-photo-label {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 12px;
+  border: 1px solid #fff9;
+  border-radius: 99px;
+  background: #fffdf2ed;
+  color: var(--green-dark);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 1px;
+}
+
+.photo-credit {
+  position: absolute;
+  right: 15px;
+  bottom: 13px;
+  color: #fff;
+  font-size: 8px;
+  text-decoration: none;
+  text-shadow: 0 1px 5px #000;
+}
+
+.photo-credit:hover {
+  text-decoration: underline;
 }
 
 .hero-art::before {
@@ -551,6 +599,154 @@
 
 .search-button:hover svg {
   transform: translateX(3px);
+}
+
+.nearby-markets {
+  padding-top: 57px;
+}
+
+.nearby-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.nearby-heading h2 {
+  margin: 8px 0 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 28px;
+  letter-spacing: -1px;
+}
+
+.nearby-heading h2 em {
+  color: var(--green);
+  font-family: Georgia, serif;
+  font-weight: 400;
+}
+
+.nearby-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.location-button,
+.nearby-map-link {
+  display: inline-flex;
+  min-height: 39px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 0 12px;
+  border: 1px solid #dfe4d8;
+  border-radius: 7px;
+  background: #fffefa;
+  color: var(--green);
+  font-size: 10px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.location-button {
+  cursor: pointer;
+}
+
+.location-button:hover,
+.nearby-map-link:hover {
+  border-color: var(--green);
+  background: #f0f3e9;
+}
+
+.location-message {
+  margin: 12px 0 0;
+  color: var(--green-dark);
+  font-size: 11px;
+}
+
+.market-place-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 13px;
+  margin-top: 20px;
+}
+
+.market-place-card {
+  display: flex;
+  min-width: 0;
+  min-height: 86px;
+  align-items: center;
+  gap: 12px;
+  padding: 15px;
+  border: 1px solid #e8e5db;
+  border-radius: 9px;
+  background: #fffefa;
+  transition: border-color 160ms ease, transform 160ms ease;
+}
+
+.market-place-card:hover {
+  transform: translateY(-2px);
+  border-color: #b6c8a9;
+}
+
+.market-place-pin {
+  display: grid;
+  width: 39px;
+  height: 39px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 50%;
+  background: #f4e9d8;
+  color: #bb5c2c;
+}
+
+.market-place-card:nth-child(2) .market-place-pin {
+  background: #f8e6e1;
+  color: var(--red);
+}
+
+.market-place-card div {
+  min-width: 0;
+}
+
+.market-place-card h3 {
+  overflow: hidden;
+  margin: 0 0 4px;
+  font-family: 'Manrope', sans-serif;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.market-place-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 9px;
+}
+
+.market-place-card > a {
+  display: grid;
+  width: 31px;
+  height: 31px;
+  flex: 0 0 auto;
+  place-items: center;
+  margin-left: auto;
+  border-radius: 50%;
+  background: #edf1e8;
+  color: var(--green);
+}
+
+.market-place-card > a:hover {
+  background: var(--green);
+  color: white;
+}
+
+.market-place-note {
+  margin: 12px 0 0;
+  color: #85877e;
+  font-size: 9px;
 }
 
 .market-section {
@@ -1312,6 +1508,10 @@
     gap: 30px;
   }
 
+  .market-place-grid {
+    grid-template-columns: 1fr;
+  }
+
   .hero-copy h1 {
     font-size: 52px;
   }
@@ -1428,6 +1628,34 @@
   .hero-art {
     height: 300px;
     border-top-right-radius: 55px;
+  }
+
+  .nearby-markets {
+    padding-top: 39px;
+  }
+
+  .nearby-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .nearby-heading h2 {
+    font-size: 25px;
+  }
+
+  .nearby-actions {
+    justify-content: flex-start;
+  }
+
+  .market-place-grid {
+    gap: 9px;
+    margin-top: 15px;
+  }
+
+  .market-place-card {
+    min-height: 75px;
+    padding: 11px;
   }
 
   .art-market-stall {

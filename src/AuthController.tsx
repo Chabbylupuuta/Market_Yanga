@@ -77,7 +77,7 @@ export default function AuthController() {
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [remember, setRemember] = useState(true)
-  const [session, setSession] = useState<StoredSession | null>(null)
+  const [session, setSession] = useState<StoredSession | null>(() => readSession())
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
@@ -100,7 +100,6 @@ export default function AuthController() {
   useEffect(() => {
     const saved = readSession()
     if (!saved) return
-    setSession(saved)
     void refreshSession(saved)
     const timer = window.setInterval(() => { void refreshSession(readSession()) }, 50 * 60 * 1000)
     return () => window.clearInterval(timer)
@@ -173,7 +172,7 @@ export default function AuthController() {
       setSession(nextSession)
       setPassword('')
       setConfirmPassword('')
-      setIsOpen(false)
+      continueToMarket()
     } catch (submitError) {
       setError(friendlyAuthError(submitError))
     } finally {
@@ -185,6 +184,12 @@ export default function AuthController() {
     clearSession()
     setSession(null)
     setIsOpen(false)
+  }
+
+  function continueToMarket() {
+    setIsOpen(false)
+    window.history.replaceState(null, '', '#listings')
+    requestAnimationFrame(() => document.getElementById('listings')?.scrollIntoView({ behavior: 'smooth' }))
   }
 
   if (!isOpen) return null
@@ -201,11 +206,12 @@ export default function AuthController() {
               <p className="yanga-auth-kicker">ACCOUNT CONNECTED</p>
               <h2 id="yanga-auth-title">Good to have<br /><em>you here.</em></h2>
               <p className="yanga-auth-intro">Signed in as <strong>{session.displayName || session.email}</strong>.</p>
+              <button className="yanga-auth-submit" type="button" onClick={continueToMarket}>Continue to market<span aria-hidden="true">→</span></button>
               <button className="yanga-auth-submit" type="button" onClick={signOut}>Sign out</button>
             </>
           ) : (
             <>
-              <p class="yanga-auth-kicker">GOOD TO HAVE YOU HERE</p>
+              <p className="yanga-auth-kicker">GOOD TO HAVE YOU HERE</p>
               <h2 id="yanga-auth-title">{mode === 'reset' ? 'Reset your password.' : <>Welcome to<br /><em>your market.</em></>}</h2>
               <p className="yanga-auth-intro">{mode === 'reset' ? 'Enter your email and we will send a password reset link.' : 'Sign in or create an account to connect with your community.'}</p>
               {mode !== 'reset' && <div className="yanga-auth-tabs" role="tablist" aria-label="Authentication mode">
