@@ -205,7 +205,7 @@ export default function AuthController() {
             </>
           ) : (
             <>
-              <p className="yanga-auth-kicker">GOOD TO HAVE YOU HERE</p>
+              <p class="yanga-auth-kicker">GOOD TO HAVE YOU HERE</p>
               <h2 id="yanga-auth-title">{mode === 'reset' ? 'Reset your password.' : <>Welcome to<br /><em>your market.</em></>}</h2>
               <p className="yanga-auth-intro">{mode === 'reset' ? 'Enter your email and we will send a password reset link.' : 'Sign in or create an account to connect with your community.'}</p>
               {mode !== 'reset' && <div className="yanga-auth-tabs" role="tablist" aria-label="Authentication mode">
