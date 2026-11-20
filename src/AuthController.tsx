@@ -17,16 +17,15 @@ type FirebaseAuthResponse = {
 }
 
 type StoredSession = AuthSession & { refreshToken: string }
-
 type AuthMode = 'login' | 'signup' | 'reset'
 
-// This is the public Firebase web API key used by Zara-Chabby's existing auth project.
-// Firebase web API keys identify the project; enable Email/Password and authorize the
-// Market Yanga domains in that project's Firebase console before using this login.
-const firebaseApiKey = import.meta.env.VITE_FIREBASE_API_KEY || 'AIzaSyDxxwwCO9U5WulqLwjRFVXGTpJB6_CBnGE'
+// Configure this with the web API key from Market Yanga's OWN Firebase project.
+// Do not use Zara-Chabby's key here: the two apps should use separate Firebase projects.
+const firebaseApiKey = import.meta.env.VITE_FIREBASE_API_KEY?.trim() || ''
 const sessionKey = 'market-yanga.firebase-auth-session'
 
 async function firebaseRequest<T>(endpoint: string, payload: Record<string, string | boolean>): Promise<T> {
+  if (!firebaseApiKey) throw new Error('FIREBASE_NOT_CONFIGURED')
   const response = await fetch(`https://identitytoolkit.googleapis.com/v1/${endpoint}?key=${firebaseApiKey}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -39,13 +38,14 @@ async function firebaseRequest<T>(endpoint: string, payload: Record<string, stri
 
 function friendlyAuthError(error: unknown) {
   const code = error instanceof Error ? error.message : ''
+  if (code.includes('FIREBASE_NOT_CONFIGURED')) return 'Market Yanga sign-in is not configured yet. Add its Firebase API key to the deployment environment.'
   if (code.includes('EMAIL_EXISTS')) return 'An account already exists with this email.'
   if (code.includes('INVALID_LOGIN_CREDENTIALS') || code.includes('EMAIL_NOT_FOUND') || code.includes('INVALID_PASSWORD')) return 'The email or password is incorrect.'
   if (code.includes('WEAK_PASSWORD')) return 'Use a stronger password with at least six characters.'
   if (code.includes('INVALID_EMAIL')) return 'Enter a valid email address.'
   if (code.includes('TOO_MANY_ATTEMPTS')) return 'Too many attempts. Please wait a moment and try again.'
-  if (code.includes('OPERATION_NOT_ALLOWED')) return 'Email and password sign-in is not enabled for this Firebase project.'
-  if (code.includes('API_KEY_INVALID')) return 'Firebase is not configured correctly. Check the Firebase API key.'
+  if (code.includes('OPERATION_NOT_ALLOWED')) return 'Email and password sign-in is not enabled for Market Yanga’s Firebase project.'
+  if (code.includes('API_KEY_INVALID')) return 'Market Yanga’s Firebase API key is invalid. Check its Firebase project settings.'
   return 'Could not connect to sign-in. Please try again.'
 }
 
@@ -86,8 +86,6 @@ export default function AuthController() {
     const openLogin = (event: MouseEvent) => {
       const target = event.target
       if (!(target instanceof Element) || !target.closest('.login-link, .sell-button, .community-banner > button')) return
-      // The prototype buttons open a phone-only placeholder modal. Handle these clicks
-      // before React so they open this real email/password Firebase flow instead.
       event.preventDefault()
       event.stopPropagation()
       setMode('login')
@@ -103,7 +101,6 @@ export default function AuthController() {
     const saved = readSession()
     if (!saved) return
     setSession(saved)
-    // Refresh the Firebase ID token when restoring a saved login.
     void refreshSession(saved)
     const timer = window.setInterval(() => { void refreshSession(readSession()) }, 50 * 60 * 1000)
     return () => window.clearInterval(timer)
@@ -119,7 +116,7 @@ export default function AuthController() {
   }, [isOpen])
 
   async function refreshSession(current: StoredSession | null) {
-    if (!current?.refreshToken) return
+    if (!current?.refreshToken || !firebaseApiKey) return
     try {
       const response = await fetch(`https://securetoken.googleapis.com/v1/token?key=${firebaseApiKey}`, {
         method: 'POST',
@@ -157,7 +154,7 @@ export default function AuthController() {
     setBusy(true)
     try {
       if (mode === 'reset') {
-        await firebaseRequest('accounts:sendO，比Code', { requestType: 'PASSWORD_RESET', email })
+        await firebaseRequest('accounts:sendOobCode', { requestType: 'PASSWORD_RESET', email })
         setMessage('Password reset email sent. Check your inbox.')
         return
       }
@@ -228,7 +225,7 @@ export default function AuthController() {
               </form>
             </>
           )}
-          <p className="yanga-auth-note">Your account is managed securely by Firebase Authentication.</p>
+          <p className="yanga-auth-note">Your account is managed securely by Market Yanga’s Firebase project.</p>
         </div>
       </section>
     </div>,
