@@ -19,9 +19,9 @@ type FirebaseAuthResponse = {
 type StoredSession = AuthSession & { refreshToken: string }
 type AuthMode = 'login' | 'signup' | 'reset'
 
-// Configure this with the web API key from Market Yanga's OWN Firebase project.
-// Do not use Zara-Chabby's key here: the two apps should use separate Firebase projects.
-const firebaseApiKey = import.meta.env.VITE_FIREBASE_API_KEY?.trim() || ''
+// Market Yanga's own Firebase web API key (project: market-yanga-log-in).
+// This intentionally does not use Zara-Chabby's Firebase project.
+const firebaseApiKey = import.meta.env.VITE_FIREBASE_API_KEY?.trim() || 'AIzaSyCQ7d9D-c8RSpVvFcuk5L7AdKsR8YDs5eE'
 const sessionKey = 'market-yanga.firebase-auth-session'
 
 async function firebaseRequest<T>(endpoint: string, payload: Record<string, string | boolean>): Promise<T> {
